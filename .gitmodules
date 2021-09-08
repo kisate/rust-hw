@@ -1,9 +1,0 @@
-[submodule "1/basic_algs"]
-	path = 1/basic_algs
-	url = https://github.com/kisate/rust-hw/tree/main/1/basic_algs
-[submodule "1/guessing_game"]
-	path = 1/guessing_game
-	url = https://github.com/kisate/rust-hw/tree/main/1/guessing_game
-[submodule "1/structs_and_methods"]
-	path = 1/structs_and_methods
-	url = https://github.com/kisate/rust-hw/tree/main/1/structs_and_methods
