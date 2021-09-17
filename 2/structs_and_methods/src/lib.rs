@@ -1,8 +1,7 @@
-use noisy_float::prelude::*;
 extern crate num_traits;
 use num_traits::Num;
 
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(Eq, Hash, Debug)]
 pub struct Point <T : Num> {
     pub x: T,
     pub y: T
@@ -13,12 +12,25 @@ impl <T : Num> Default for Point <T> {
         Self { x: T::zero(), y: T::zero() }
     }
 }
-#[derive(PartialEq, Eq, Hash, Debug)]
+impl <T : Num> PartialEq for Point <T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}
+
+
+#[derive(Eq, Hash, Debug)]
 pub struct Rect <T : Num> {
     pub x: T,
     pub y: T,
     pub w: T,
     pub h: T
+}
+
+impl  <T : Num> PartialEq for Rect <T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y && self.w == other.w && self.h == other.h
+    }
 }
 
 impl <T : Num + PartialOrd + Copy> Rect <T> {
@@ -36,11 +48,17 @@ impl <T : Num> Default for Rect <T> {
         Self { x: T::zero(), y: T::zero(), w: T::one(), h: T::one() }
     }
 }
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(Eq, Hash, Debug)]
 pub struct Circle <T : Num> {
     pub x: T,
     pub y: T,
     pub r: T
+}
+
+impl <T : Num> PartialEq for Circle <T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y && self.r == other.r
+    }
 }
 
 impl <T : Num + From<f64> + PartialOrd + Copy> Circle <T> {
@@ -60,10 +78,22 @@ impl <T : Num> Default for Circle <T> {
 }
 
 
+#[derive(Eq, Hash, Debug)]
 enum Figure <T : Num> {
     Rect(Rect <T>),
     Circle(Circle <T> )
 }
+
+impl <T : Num> PartialEq for Figure <T>  {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Rect(l0), Self::Rect(r0)) => l0 == r0,
+            (Self::Circle(l0), Self::Circle(r0)) => l0 == r0,
+            _ => false
+        }
+    }
+}
+
 
 impl <T : Num + PartialOrd + From<f64> + Copy> Figure <T> {
     fn contains(&self, p: &Point <T>) -> bool {
