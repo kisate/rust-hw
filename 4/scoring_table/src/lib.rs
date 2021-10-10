@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 pub fn transform(old: &HashMap<u32, Vec<char>>) -> HashMap<char, u32> {
-    let mut new_map:HashMap<char, u32> = HashMap::new();
-    
+    let mut new_map: HashMap<char, u32> = HashMap::new();
+
     for (key, vals) in old {
         for val in vals {
             new_map.insert(val.to_ascii_lowercase(), *key);
@@ -13,7 +13,10 @@ pub fn transform(old: &HashMap<u32, Vec<char>>) -> HashMap<char, u32> {
 }
 
 pub fn score(input: &str, score_table: &HashMap<char, u32>) -> u32 {
-    input.chars().map(|x| -> u32 {*score_table.get(&x.to_ascii_lowercase()).unwrap_or(&0)}).sum()
+    input
+        .chars()
+        .map(|x| -> u32 { *score_table.get(&x.to_ascii_lowercase()).unwrap_or(&0) })
+        .sum()
 }
 
 #[cfg(test)]

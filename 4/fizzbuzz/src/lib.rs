@@ -29,15 +29,17 @@ use std::{fmt, ops::Rem, process::Output};
 /// текущий элемент T быть заменен на слово? Если да, то на какое?
 pub struct Matcher<T> {
     pub predicate: Box<dyn Fn(T) -> bool>,
-    pub substitute: String
+    pub substitute: String,
 }
 
-impl <T> Matcher<T>{
-    pub fn new<F: Fn(T) -> bool + 'static>(predicate: F, substitute: &str) -> Self{
-        Matcher {predicate: Box::new(predicate), substitute: substitute.to_string()}
+impl<T> Matcher<T> {
+    pub fn new<F: Fn(T) -> bool + 'static>(predicate: F, substitute: &str) -> Self {
+        Matcher {
+            predicate: Box::new(predicate),
+            substitute: substitute.to_string(),
+        }
     }
 }
-
 
 /// Набор правил Matcher, которые можно применить к итератору.
 ///
@@ -46,51 +48,51 @@ impl <T> Matcher<T>{
 ///
 /// Зато можно попрактиковаться с более простым интерфейсом `apply`.
 pub struct Fizzy<T> {
-    matchers: Vec<Matcher<T>>
+    matchers: Vec<Matcher<T>>,
 }
 
 impl<T> Fizzy<T> {
     // можете использовать `mut self` в сигнатуре, если вам нравится
-    pub fn add_matcher(self, _matcher: Matcher<T>) -> Self { 
+    pub fn add_matcher(self, _matcher: Matcher<T>) -> Self {
         let mut matchers = self.matchers;
         matchers.push(_matcher);
-        Self {
-            matchers
-        }
+        Self { matchers }
     }
 }
 
-impl <T: fmt::Display + Copy> Fizzy<T>{
+impl<T: fmt::Display + Copy> Fizzy<T> {
     /// Применяет набор Matchers к каждому элементу итератора
     pub fn apply<I: Iterator<Item = T>>(self, _iter: I) -> impl Iterator<Item = String> {
         _iter.map(move |elem| {
-            self.matchers.iter().filter(|matcher| (matcher.predicate)(elem)).fold(None, |cum: Option<String>, mat| {
-                match cum {
+            self.matchers
+                .iter()
+                .filter(|matcher| (matcher.predicate)(elem))
+                .fold(None, |cum: Option<String>, mat| match cum {
                     Some(subs) => {
                         let mut new_subs = subs;
                         new_subs.push_str(&mat.substitute);
                         Some(new_subs)
                     }
-                    None => Some(mat.substitute.clone())
-                }
-            }).unwrap_or(elem.to_string())
+                    None => Some(mat.substitute.clone()),
+                })
+                .unwrap_or(elem.to_string())
         })
     }
 }
 
-impl <T> Fizzy<T> {
+impl<T> Fizzy<T> {
     fn new() -> Self {
-        Self {matchers: vec![]}
+        Self { matchers: vec![] }
     }
 }
 
 /// Вспомогательная функция: возвращает `Fizzy` со стандартными правилами FizzBuzz
-pub fn fizz_buzz<T: Rem<Output=T> + From<u8> + PartialEq>() -> Fizzy<T> {
+pub fn fizz_buzz<T: Rem<Output = T> + From<u8> + PartialEq>() -> Fizzy<T> {
     Fizzy {
         matchers: vec![
             Matcher::new(|x| x % T::from(3) == T::from(0), "fizz"),
-            Matcher::new(|x| x % T::from(5) == T::from(0), "buzz")
-        ]
+            Matcher::new(|x| x % T::from(5) == T::from(0), "buzz"),
+        ],
     }
 }
 
