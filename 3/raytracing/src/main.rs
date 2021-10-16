@@ -1,4 +1,5 @@
-use raytracing::{render, Light, Material, Sphere, Vec3f};
+use raytracing::{render};
+use raytracing::data::{Light, Material, Sphere, Vec3f};
 fn main() {
     let ivory = Material {
         diffuse_color: Vec3f(0.4, 0.4, 0.3),
