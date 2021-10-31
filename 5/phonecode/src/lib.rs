@@ -1,44 +1,41 @@
-use std::{collections::HashMap};
-
-use trie::{add_word, Node};
+use trie::Node;
 
 pub mod trie;
 
-fn build_trie(words: &[String], dict: HashMap<char, u8>) -> Node {
-    let mut node = Node::default();
-    for word in words.iter() {
-        add_word(word, &mut node, &dict)
-    }
+fn collect_answers(root: &Node, mut seq: &[u8], use_number: bool) -> Vec<String> {
 
-    node
-}
-
-fn collect_answers(root: &Node, seq: &[u8], use_number: bool) -> Vec<String> {
-    // println!("{:?}", &seq);
     let mut ans = vec![];
     let mut node = &root.clone();
-    for (i, x) in seq.iter().enumerate() {
+    for x in seq.clone().iter() {
         match &node.next[*x as usize] {
             Some(next_node) => {
-                for word in node.words.iter() {
-                    let part: Vec<String> = code_seq(root, &seq[i+1..], use_number)
-                        .iter()
-                        .map(|s| format!("{} {}", word, s))
-                        .collect();
-                    ans.extend(part);
-                    println!("{:?} {:?}", next_node.words, ans);
+                if !seq.is_empty() {
+                    seq = &seq[1..];
+                    for word in next_node.words.iter() {
+                        let part: Vec<String> = code_seq(root, seq, use_number)
+                            .iter()
+                            .map(|s| format!("{} {}", word, s))
+                            .collect();
+                        ans.extend(part);
+                    }
+                    node = next_node;
                 }
-                node = next_node;
             }
             None => break,
         }
+    }
+    if seq.is_empty(){
+        ans.extend(node.words.clone());
     }
     ans
 }
 
 pub fn code_seq(root: &Node, seq: &[u8], use_number: bool) -> Vec<String> {
     let mut ans = collect_answers(root, seq, true);
-    if ans.is_empty() && use_number {
+    if ans.is_empty() && use_number && seq.len() == 1 {
+        ans = vec![seq[0].to_string()];
+    }
+    else if ans.is_empty() && use_number && !seq.is_empty() {
         ans = collect_answers(root, &seq[1..], false).iter().map(|word| format!("{} {}", seq[0], word)).collect()
     }
     ans
@@ -46,7 +43,9 @@ pub fn code_seq(root: &Node, seq: &[u8], use_number: bool) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
-    use std::{fs, io::BufRead};
+    use std::{collections::HashMap, fs};
+
+    use crate::trie::add_word;
 
     use super::*;
 
@@ -89,6 +88,16 @@ mod tests {
         let number: [u8; 6] = [5,6,2,4,8,2];
 
         let result = code_seq(&root, &number, true);
-        println!("{:?}", result);
+        assert_eq!(result, ["mir Tor", "Mix Tor"]);
+        
+        let mut root2 = Node::default();
+
+        for line in fs::read_to_string("dictionary.txt").expect("Bad file").lines() {
+            add_word(&line.to_string(), &mut root2, &dict);
+        }
+
+        let number2: [u8; 8] = [8,8,5,6,3,5,3,8];
+        let result = code_seq(&root2, &number2, true);
+        assert_eq!(result, ["O\"l Midas 8", "Po Midas 8", "Opa 6 da so"]);
     }
 }

@@ -41,9 +41,8 @@ fn main() {
         for line in lines {
             if let Ok(ip) = line {
                 let seq = ip.chars().filter(|c| c.is_numeric()).map(|c| c.to_string().parse().unwrap()).collect::<Vec<u8>>();
-                println!("{:?}", code_seq(&root, &seq, false));
                 for answ in code_seq(&root, &seq, false) {
-                    println!("{}", answ)
+                    println!("{}: {}", ip, answ)
                 }
             }
         }
