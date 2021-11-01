@@ -43,4 +43,4 @@ pub fn add_word(word: &String, node: &mut Node, dict: &HashMap<char, u8>) {
         .collect();
 
     node.add_seq(&seq).words.push(word.to_string());
-}   
+}
